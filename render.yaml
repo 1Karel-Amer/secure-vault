@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: secure-vault
+    env: node
+    buildCommand: npm install
+    startCommand: node server/index.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: STEP_TOKEN_SECRET
+        generateValue: true
+      - key: COOKIE_SECRET
+        generateValue: true
+      # Set these manually in Render dashboard after running: npm run setup
+      - key: REAL_AUTH_PATH
+        sync: false
+      - key: GROUP_PASSPHRASE_HASH
+        sync: false
+      - key: USER_1_USERNAME
+        sync: false
+      - key: USER_1_PASSWORD_HASH
+        sync: false
+      - key: USER_1_TOTP_SECRET
+        sync: false
+      - key: USER_2_USERNAME
+        sync: false
+      - key: USER_2_PASSWORD_HASH
+        sync: false
+      - key: USER_2_TOTP_SECRET
+        sync: false
+      - key: USER_3_USERNAME
+        sync: false
+      - key: USER_3_PASSWORD_HASH
+        sync: false
+      - key: USER_3_TOTP_SECRET
+        sync: false
+      - key: USER_4_USERNAME
+        sync: false
+      - key: USER_4_PASSWORD_HASH
+        sync: false
+      - key: USER_4_TOTP_SECRET
+        sync: false

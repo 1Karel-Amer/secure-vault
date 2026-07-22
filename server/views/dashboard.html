@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure Vault — Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: monospace;
+      background: #080808;
+      color: #bbb;
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    header h1 { font-size: 0.9rem; color: #555; letter-spacing: 0.15em; }
+    header span { font-size: 0.75rem; color: #333; }
+    #logoutBtn {
+      background: none;
+      border: 1px solid #222;
+      border-radius: 3px;
+      color: #444;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+    }
+    #logoutBtn:hover { border-color: #444; color: #888; }
+
+    /* Stats row */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #0f0f0f;
+      border: 1px solid #1a1a1a;
+      border-radius: 4px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-card .label { font-size: 0.65rem; color: #444; text-transform: uppercase; letter-spacing: 0.1em; }
+    .stat-card .value { font-size: 1.6rem; color: #666; margin-top: 0.3rem; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab {
+      background: none;
+      border: 1px solid #1a1a1a;
+      border-radius: 3px;
+      color: #444;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+    }
+    .tab.active { border-color: #333; color: #888; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+    th {
+      color: #444;
+      text-align: left;
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid #1a1a1a;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    td {
+      color: #666;
+      padding: 0.35rem 0.6rem;
+      border-bottom: 1px solid #111;
+      max-width: 250px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    tr:hover td { background: #0c0c0c; }
+    .badge {
+      border-radius: 2px;
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+    }
+    .badge.success { background: #0d2010; color: #3a8a3a; }
+    .badge.fail    { background: #200d0d; color: #8a3a3a; }
+    .badge.ban     { background: #1a1000; color: #8a6a00; }
+    #noData { color: #2a2a2a; font-size: 0.8rem; padding: 1rem 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>[ SECURE VAULT — INTRUSION LOG ]</h1>
+    <div style="display:flex;gap:1rem;align-items:center">
+      <span id="userLabel">–</span>
+      <button id="logoutBtn" onclick="logout()">LOGOUT</button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">Honeypot Hits</div>
+      <div class="value" id="statHoneypot">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">IPs Banned</div>
+      <div class="value" id="statBanned">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Auth Failures</div>
+      <div class="value" id="statFails">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Successful Logins</div>
+      <div class="value" id="statSuccess">–</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('honeypot')">Honeypot Logs</button>
+    <button class="tab"        onclick="showTab('auth')">Auth Attempts</button>
+    <button class="tab"        onclick="showTab('bans')">Banned IPs</button>
+    <button class="tab"        onclick="showTab('sessions')">Active Sessions</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap" id="tableContainer">
+    <p id="noData">Loading...</p>
+  </div>
+
+  <script>
+    let currentTab = 'honeypot';
+
+    async function apiFetch(endpoint) {
+      const r = await fetch('/vault-admin/api/' + endpoint);
+      if (!r.ok) throw new Error('API error');
+      return r.json();
+    }
+
+    async function loadStats() {
+      try {
+        const s = await apiFetch('stats');
+        document.getElementById('statHoneypot').textContent = s.honeypotHits ?? '–';
+        document.getElementById('statBanned').textContent   = s.bannedCount   ?? '–';
+        document.getElementById('statFails').textContent    = s.authFails     ?? '–';
+        document.getElementById('statSuccess').textContent  = s.authSuccess   ?? '–';
+      } catch {}
+    }
+
+    async function loadUser() {
+      try {
+        const me = await apiFetch('me');
+        document.getElementById('userLabel').textContent = me.username || '–';
+      } catch {}
+    }
+
+    function makeTable(cols, rows) {
+      if (!rows.length) return '<p id="noData">No records yet.</p>';
+      const ths = cols.map(c => `<th>${c.label}</th>`).join('');
+      const trs = rows.map(row => {
+        const tds = cols.map(c => {
+          let val = row[c.key] ?? '–';
+          if (c.badge) {
+            const cls = val === 1 || val === '1' ? 'success' : 'fail';
+            val = `<span class="badge ${cls}">${val === 1 || val === '1' ? 'OK' : 'FAIL'}</span>`;
+          }
+          return `<td title="${val}">${val}</td>`;
+        }).join('');
+        return `<tr>${tds}</tr>`;
+      }).join('');
+      return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+    }
+
+    async function showTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        const tabs = ['honeypot','auth','bans','sessions'];
+        t.classList.toggle('active', tabs[i] === tab);
+      });
+      document.getElementById('tableContainer').innerHTML = '<p id="noData">Loading...</p>';
+
+      try {
+        if (tab === 'honeypot') {
+          const rows = await apiFetch('honeypot-logs');
+          document.getElementById('tableContainer').innerHTML = makeTable([
+            { label: 'Time',       key: 'timestamp' },
+            { label: 'IP',         key: 'ip' },
+            { label: 'Event',      key: 'event_type' },
+            { label: 'Username',   key: 'username_tried' },
+            { label: 'User-Agent', key: 'user_agent' },
+          ], rows);
+        } else if (tab === 'auth') {
+          const rows = await apiFetch('auth-logs');
+          document.getElementById('tableContainer').innerHTML = makeTable([
+            { label: 'Time',     key: 'timestamp' },
+            { label: 'IP',       key: 'ip' },
+            { label: 'Username', key: 'username' },
+            { label: 'Stage',    key: 'stage' },
+            { label: 'Result',   key: 'success', badge: true },
+            { label: 'UA',       key: 'user_agent' },
+          ], rows);
+        } else if (tab === 'bans') {
+          const rows = await apiFetch('banned-ips');
+          document.getElementById('tableContainer').innerHTML = makeTable([
+            { label: 'IP',          key: 'ip' },
+            { label: 'Banned Until',key: 'banned_until' },
+            { label: 'Reason',      key: 'reason' },
+            { label: 'Hit Count',   key: 'hit_count' },
+          ], rows);
+        } else if (tab === 'sessions') {
+          const data = await apiFetch('sessions');
+          document.getElementById('tableContainer').innerHTML = makeTable([
+            { label: 'Username',   key: 'username' },
+            { label: 'IP',         key: 'ip' },
+            { label: 'Login Time', key: 'created_at' },
+            { label: 'Expires',    key: 'expires_at' },
+          ], data.sessions || []);
+        }
+      } catch (e) {
+        document.getElementById('tableContainer').innerHTML = '<p id="noData">Failed to load data.</p>';
+      }
+    }
+
+    async function logout() {
+      await fetch('/vault-admin/logout', { method: 'POST' });
+      window.location.href = '/';
+    }
+
+    // Init
+    loadUser();
+    loadStats();
+    showTab('honeypot');
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => { loadStats(); showTab(currentTab); }, 30000);
+  </script>
+</body>
+</html>
