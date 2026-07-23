@@ -3,26 +3,389 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>System Portal</title>
+  <title>PurrFect Cats — Your Daily Dose of Cats</title>
+  <meta name="description" content="PurrFect Cats is your go-to source for cat facts, adorable cat photos, and everything about our feline friends." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: monospace;
-      background: #090909;
-      color: #444;
+      font-family: 'Lato', sans-serif;
+      background: #fdf8f3;
+      color: #3a2e28;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: #fff;
+      border-bottom: 1px solid #f0e8e0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: #c07850;
+      text-decoration: none;
+    }
+    .nav-logo span { color: #e8a87c; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; list-style: none; }
+    .nav-links a {
+      color: #7a6a5a;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #c07850; }
+    .nav-links .btn-login {
+      background: #c07850;
+      border-radius: 20px;
+      color: #fff !important;
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      transition: background 0.2s !important;
+    }
+    .nav-links .btn-login:hover { background: #a86040 !important; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      height: 480px;
+      overflow: hidden;
+    }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 60%);
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      padding: 3rem;
+    }
+    .hero-overlay h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      color: #fff;
+      line-height: 1.2;
+      max-width: 480px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .hero-overlay p {
+      color: rgba(255,255,255,0.85);
+      margin-top: 0.8rem;
+      font-size: 1rem;
+      max-width: 380px;
+    }
+    .hero-overlay a {
+      margin-top: 1.5rem;
+      display: inline-block;
+      background: #e8a87c;
+      color: #fff;
+      padding: 0.65rem 1.6rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      width: fit-content;
+      transition: background 0.2s;
+    }
+    .hero-overlay a:hover { background: #c07850; }
+
+    /* ── SECTIONS ── */
+    section { padding: 3rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #c07850;
+      margin-bottom: 0.3rem;
+    }
+    .section-sub { color: #9a8a7a; font-size: 0.9rem; margin-bottom: 2rem; }
+
+    /* ── FACTS ── */
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+    }
+    .fact-card {
+      background: #fff;
+      border: 1px solid #f0e8e0;
+      border-radius: 12px;
+      padding: 1.4rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fact-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); }
+    .fact-card .emoji { font-size: 2rem; margin-bottom: 0.6rem; }
+    .fact-card h3 { font-size: 1rem; color: #5a4a3a; margin-bottom: 0.4rem; }
+    .fact-card p { font-size: 0.85rem; color: #8a7a6a; line-height: 1.6; }
+
+    /* ── BLOG POSTS ── */
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .post-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #f0e8e0;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .post-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .post-thumb {
+      height: 140px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      gap: 0.5rem;
+      font-size: 4rem;
     }
-    p { font-size: 0.8rem; }
-    a { color: #333; font-size: 0.75rem; }
-    a:hover { color: #555; }
+    .post-body { padding: 1rem 1.2rem 1.4rem; }
+    .post-tag {
+      background: #fce8d8;
+      border-radius: 10px;
+      color: #c07850;
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.6rem;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .post-body h3 { font-size: 1rem; color: #3a2e28; margin-bottom: 0.4rem; line-height: 1.4; }
+    .post-body p { font-size: 0.82rem; color: #8a7a6a; line-height: 1.6; }
+    .post-date { font-size: 0.75rem; color: #baa89a; margin-top: 0.8rem; }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      background: linear-gradient(135deg, #f9ede2, #fdf0e8);
+      border-radius: 16px;
+      padding: 2.5rem;
+      text-align: center;
+      border: 1px solid #f0e0d0;
+    }
+    .newsletter h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: #c07850;
+      margin-bottom: 0.5rem;
+    }
+    .newsletter p { color: #8a7a6a; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .newsletter-form { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+    .newsletter-form input {
+      border: 1px solid #e8d8c8;
+      border-radius: 25px;
+      color: #5a4a3a;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      padding: 0.6rem 1.2rem;
+      width: 260px;
+    }
+    .newsletter-form input:focus { border-color: #c07850; }
+    .newsletter-form button {
+      background: #c07850;
+      border: none;
+      border-radius: 25px;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.6rem 1.4rem;
+      transition: background 0.2s;
+    }
+    .newsletter-form button:hover { background: #a86040; }
+    #subscribeMsg { color: #c07850; font-size: 0.85rem; margin-top: 0.8rem; min-height: 1.2rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #3a2e28;
+      color: #8a7a6a;
+      font-size: 0.8rem;
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+    footer span { color: #c07850; }
+
+    /* ── CAT CURSOR TRAIL (fun touch) ── */
+    .paw {
+      pointer-events: none;
+      position: fixed;
+      font-size: 1rem;
+      opacity: 0.6;
+      animation: fadePaw 0.8s forwards;
+      z-index: 9999;
+    }
+    @keyframes fadePaw {
+      0%   { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.3); }
+    }
   </style>
 </head>
 <body>
-  <p>System portal.</p>
-  <p>Authorized access only.</p>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="/">Purr<span>Fect</span> Cats 🐾</a>
+    <ul class="nav-links">
+      <li><a href="#facts">Cat Facts</a></li>
+      <li><a href="#posts">Blog</a></li>
+      <li><a href="#newsletter">Newsletter</a></li>
+      <li><a href="/login" class="btn-login">Member Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <img src="/cat-hero.png" alt="Cute cat on a desk" />
+    <div class="hero-overlay">
+      <h1>Life is Better with Cats 🐱</h1>
+      <p>Daily cat facts, adorable stories, and everything about our purring companions.</p>
+      <a href="#facts">Explore Cat Facts →</a>
+    </div>
+  </div>
+
+  <!-- CAT FACTS -->
+  <section id="facts">
+    <h2 class="section-title">🐾 Did You Know?</h2>
+    <p class="section-sub">Fascinating facts about our feline friends</p>
+    <div class="facts-grid">
+      <div class="fact-card">
+        <div class="emoji">😴</div>
+        <h3>Cats Sleep A LOT</h3>
+        <p>Cats sleep between 12 to 16 hours a day. They are crepuscular, meaning most active at dawn and dusk.</p>
+      </div>
+      <div class="fact-card">
+        <div class="emoji">👂</div>
+        <h3>Super Hearing</h3>
+        <p>Cats can hear frequencies up to 64kHz — compared to humans who top out at around 20kHz.</p>
+      </div>
+      <div class="fact-card">
+        <div class="emoji">🐾</div>
+        <h3>Unique Nose Prints</h3>
+        <p>Just like human fingerprints, every cat's nose print is completely unique!</p>
+      </div>
+      <div class="fact-card">
+        <div class="emoji">💨</div>
+        <h3>Speed Runners</h3>
+        <p>Domestic cats can sprint up to 30 mph (48 km/h) over short distances.</p>
+      </div>
+      <div class="fact-card">
+        <div class="emoji">🗣️</div>
+        <h3>Meowing for Humans</h3>
+        <p>Adult cats rarely meow at each other — they developed meowing specifically to communicate with humans!</p>
+      </div>
+      <div class="fact-card">
+        <div class="emoji">🌙</div>
+        <h3>Night Vision</h3>
+        <p>Cats can see in near darkness. Their eyes need about 6x less light than humans to see clearly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG POSTS -->
+  <section id="posts" style="background:#fff; max-width:100%; padding: 3rem 2rem;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <h2 class="section-title">📰 Latest Posts</h2>
+      <p class="section-sub">Stories and tips from our cat-loving community</p>
+      <div class="posts-grid">
+        <div class="post-card">
+          <div class="post-thumb" style="background:#fce8d8;">🐱</div>
+          <div class="post-body">
+            <span class="post-tag">Care Tips</span>
+            <h3>How to Keep Your Indoor Cat Happy and Active</h3>
+            <p>Indoor cats need enrichment to stay healthy. Here are 10 ways to keep them entertained...</p>
+            <p class="post-date">July 20, 2026</p>
+          </div>
+        </div>
+        <div class="post-card">
+          <div class="post-thumb" style="background:#e8f0d8;">😸</div>
+          <div class="post-body">
+            <span class="post-tag">Behavior</span>
+            <h3>Why Does My Cat Bring Me "Gifts"?</h3>
+            <p>If your cat drops a toy or something worse at your feet, they're actually showing affection...</p>
+            <p class="post-date">July 18, 2026</p>
+          </div>
+        </div>
+        <div class="post-card">
+          <div class="post-thumb" style="background:#e8d8f8;">🍽️</div>
+          <div class="post-body">
+            <span class="post-tag">Nutrition</span>
+            <h3>The Best Foods for a Long, Healthy Cat Life</h3>
+            <p>What you feed your cat has a huge impact on their lifespan. Here's what vets recommend...</p>
+            <p class="post-date">July 15, 2026</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section id="newsletter">
+    <div class="newsletter">
+      <h2>🐾 Join the PurrFect Community</h2>
+      <p>Get weekly cat facts, adorable photos, and care tips delivered to your inbox.</p>
+      <div class="newsletter-form">
+        <input type="email" id="emailInput" placeholder="your@email.com" />
+        <button onclick="subscribe()">Subscribe</button>
+      </div>
+      <p id="subscribeMsg"></p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 <span>PurrFect Cats</span> — Made with 🧡 for cat lovers everywhere</p>
+  </footer>
+
+  <script>
+    // Fake subscribe
+    function subscribe() {
+      const email = document.getElementById('emailInput').value;
+      const msg   = document.getElementById('subscribeMsg');
+      if (!email || !email.includes('@')) {
+        msg.textContent = 'Please enter a valid email address.';
+        return;
+      }
+      msg.textContent = '🐾 Thanks! You\'re now part of the PurrFect family!';
+      document.getElementById('emailInput').value = '';
+    }
+
+    // Paw print cursor trail
+    document.addEventListener('mousemove', (e) => {
+      if (Math.random() > 0.92) {
+        const paw = document.createElement('div');
+        paw.className = 'paw';
+        paw.textContent = '🐾';
+        paw.style.left = (e.clientX - 10) + 'px';
+        paw.style.top  = (e.clientY - 10) + 'px';
+        document.body.appendChild(paw);
+        setTimeout(() => paw.remove(), 800);
+      }
+    });
+
+    // Enter key on newsletter
+    document.getElementById('emailInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') subscribe();
+    });
+  </script>
+
 </body>
 </html>
