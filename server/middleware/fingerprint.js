@@ -6,10 +6,11 @@ const crypto = require('crypto');
  */
 function createFingerprint(req) {
   const components = [
-    req.get('User-Agent')       || 'no-ua',
-    req.get('Accept-Language')  || 'no-lang',
-    req.get('Accept-Encoding')  || 'no-enc',
-    req.get('Accept')           || 'no-accept',
+    req.get('User-Agent')      || 'no-ua',
+    req.get('Accept-Language') || 'no-lang',
+    req.get('Accept-Encoding') || 'no-enc',
+    // Note: Accept header intentionally excluded — it differs between
+    // fetch() requests (login) and browser navigation (dashboard redirect)
   ].join('||');
 
   return crypto.createHash('sha256').update(components).digest('hex');
