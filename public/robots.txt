@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /vault-admin
+
+# Looking for something? Try /clue.txt
