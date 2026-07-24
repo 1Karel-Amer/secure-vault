@@ -64,6 +64,11 @@ app.use('/login', honeypotRouter);
 const REAL_AUTH_PATH = process.env.REAL_AUTH_PATH || '/sv/g8te';
 app.use(REAL_AUTH_PATH, authRouter);
 
+// Cat-themed alias → silently redirects to real portal (share this with your group)
+app.get('/cats/members-area', (req, res) => {
+  res.redirect(REAL_AUTH_PATH);
+});
+
 // Admin dashboard: requires valid session cookie
 app.use('/vault-admin', adminRouter);
 
