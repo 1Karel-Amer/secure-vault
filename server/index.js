@@ -57,6 +57,18 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// robots.txt — hints at clue.txt (hackers always check this)
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send('User-agent: *\nDisallow: /vault-admin\n\n# Looking for something? Try /clue.txt');
+});
+
+// clue.txt — CTF hint pointing to the blog
+app.get('/clue.txt', (req, res) => {
+  res.type('text/plain');
+  res.send('\uD83D\uDC3E CLUE #1\n\nThe door you\'re looking for isn\'t where you\'d expect.\nStart where the cats roam freely.\nRead carefully \u2014 members know where to go.\n\nGood luck. \uD83D\uDC31');
+});
+
 // Honeypot: visible, obvious, traps attackers
 app.use('/login', honeypotRouter);
 
